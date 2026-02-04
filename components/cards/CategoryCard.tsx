@@ -37,10 +37,11 @@ export function CategoryCard({
         categoryStyles[category],
         isSelected && "ring-2 ring-primary ring-offset-2"
       )}
+      // max-sm:text-sm max-sm:p-2 max-sm:h-20 max-sm:gap-2
     >
-      <span className="text-4xl mb-3">{info.icon}</span>
-      <h3 className="font-display font-semibold text-lg">{info.label}</h3>
-      <p className="text-sm opacity-70 mt-1 text-center">
+      <span className="text-4xl mb-3 max-sm:text-2xl max-sm:mb-0">{info.icon}</span>
+      <h3 className="font-display font-semibold text-lg max-sm:text-md">{info.label}</h3>
+      <p className="text-sm opacity-70 mt-1 text-center max-sm:text-xs">
         {info.description}
       </p>
     </button>

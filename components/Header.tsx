@@ -1,17 +1,16 @@
 "use client";
-
 import { ShoppingCart, ChefHat } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
-  activeTab: "browse" | "recipes" | "list";
-  onTabChange: (tab: "browse" | "recipes" | "list") => void;
+  activeTab: "browse" | "recipes" | "planner" | "list";
+  onTabChange: (tab: "browse" | "recipes" | "planner" | "list") => void;
   cartCount: number;
 }
 
 export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border max-w-6xl mx-auto px-4">
       <div className="container py-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -43,18 +42,20 @@ export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
 
         <nav className="flex gap-1 bg-muted p-1 rounded-lg">
           {[
-            { key: "browse", label: "Browse Foods" },
-            { key: "recipes", label: "Recipes" },
+            { key: "browse", label: "Browse Ingredients" },
             { key: "list", label: "Shopping List" },
+            { key: "planner", label: "Meal Planner" },
+            { key: "recipes", label: "Recipes" },
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => onTabChange(tab.key as HeaderProps["activeTab"])}
               className={cn(
                 "flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200",
+                "max-sm:py-1.5 max-sm:px-2 max-sm:text-xs", // smaller tabs on mobile
                 activeTab === tab.key
                   ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {tab.label}

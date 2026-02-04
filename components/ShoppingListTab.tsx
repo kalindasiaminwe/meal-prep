@@ -36,7 +36,7 @@ export function ShoppingListTab({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
+      <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in max-w-6xl mx-auto px-4 pb-10">
         <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
           <ShoppingCart className="h-10 w-10 text-muted-foreground" />
         </div>
@@ -51,7 +51,7 @@ export function ShoppingListTab({
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in max-w-6xl mx-auto px-4 pb-10 flex flex-col">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-semibold text-foreground">

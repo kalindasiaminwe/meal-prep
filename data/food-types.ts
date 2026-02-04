@@ -12,6 +12,7 @@ export interface FoodItem {
   category: FoodCategory;
   unit: string;
   image?: string;
+  quantity: number;
 }
 
 export interface ShoppingItem extends FoodItem {

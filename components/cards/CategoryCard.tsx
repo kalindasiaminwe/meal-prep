@@ -32,18 +32,34 @@ export function CategoryCard({
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all duration-300",
-        "hover:shadow-hover hover:-translate-y-1",
+        // 🔒 CRITICAL WIDTH CONTROL
+        "w-full max-w-full min-w-0 overflow-hidden",
+
+        // Layout
+        "flex flex-col items-center justify-center",
+        "p-3 sm:p-4 rounded-xl border-2 transition-all duration-200",
+
+        // Effects
+        "hover:shadow-hover hover:-translate-y-0.5",
+
         categoryStyles[category],
-        isSelected && "ring-2 ring-primary ring-offset-2"
+        isSelected && "ring-2 ring-primary ring-offset-1"
       )}
-      // max-sm:text-sm max-sm:p-2 max-sm:h-20 max-sm:gap-2
     >
-      <span className="text-4xl mb-3 max-sm:text-2xl max-sm:mb-0">{info.icon}</span>
-      <h3 className="font-display font-semibold text-lg max-sm:text-md">{info.label}</h3>
-      <p className="text-sm opacity-70 mt-1 text-center max-sm:text-xs">
-        {info.description}
-      </p>
+      {/* Icon */}
+      <span className="text-2xl sm:text-3xl mb-1 sm:mb-2 shrink-0">
+        {info.icon}
+      </span>
+
+      {/* Text container */}
+      <div className="min-w-0 text-center">
+        <h3 className="font-display font-semibold text-sm sm:text-base truncate">
+          {info.label}
+        </h3>
+        <p className="text-xs sm:text-sm opacity-70 truncate">
+          {info.description}
+        </p>
+      </div>
     </button>
   );
 }

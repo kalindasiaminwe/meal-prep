@@ -1,27 +1,30 @@
 "use client";
+
 import { ShoppingCart, ChefHat } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   activeTab: "browse" | "recipes" | "planner" | "list";
-  onTabChange: (tab: "browse" | "recipes" | "planner" | "list") => void;
+  onTabChange: (tab: HeaderProps["activeTab"]) => void;
   cartCount: number;
 }
 
 export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border max-w-6xl mx-auto px-4">
-      <div className="container py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <ChefHat className="h-6 w-6 text-primary" />
+    <header className="sticky top-0 z-50 overflow-x-hidden border-b bg-background/95 backdrop-blur">
+      <div className=" px-3 py-2 sm:px-4 sm:py-4 min-w-0">
+        {/* Top row */}
+        <div className="flex items-center justify-between gap-2 mb-2 sm:mb-4 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <div>
-              <h1 className="font-display font-bold text-xl text-foreground">
+
+            <div className="min-w-0">
+              <h1 className="font-display font-bold text-sm sm:text-xl truncate">
                 PantryPal
               </h1>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                 Your kitchen companion
               </p>
             </div>
@@ -29,33 +32,33 @@ export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
 
           <button
             onClick={() => onTabChange("list")}
-            className="relative p-2 rounded-full hover:bg-muted transition-colors"
+            className="relative shrink-0 p-2 rounded-full hover:bg-muted"
           >
-            <ShoppingCart className="h-6 w-6 text-foreground" />
+            <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
+              <span className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
           </button>
         </div>
 
-        <nav className="flex gap-1 bg-muted p-1 rounded-lg">
+        {/* Tabs */}
+        <nav className="grid grid-cols-1 md:grid-cols-4 gap-1 bg-muted p-1 rounded-lg max-w-full">
           {[
-            { key: "browse", label: "Browse Ingredients" },
-            { key: "list", label: "Shopping List" },
-            { key: "planner", label: "Meal Planner" },
+            { key: "browse", label: "Browse" },
+            { key: "list", label: "List" },
             { key: "recipes", label: "Recipes" },
+            { key: "planner", label: "Planner" },
           ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => onTabChange(tab.key as HeaderProps["activeTab"])}
               className={cn(
-                "flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200",
-                "max-sm:py-1.5 max-sm:px-2 max-sm:text-xs", // smaller tabs on mobile
+                "w-full min-w-0 px-2 py-2 text-xs sm:text-sm rounded-md truncate transition",
                 activeTab === tab.key
                   ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {tab.label}

@@ -10,11 +10,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
+import { jsPDF } from 'jspdf';
 import { Recipe } from '@/data/food-types';
 import { sampleRecipes } from '@/data/recipes';
-import { toast } from 'sonner';
-
-
 interface MealPlannerTabProps {
   mealPlan: Record<string, Recipe | null>;
   onAddMeal: (day: DayOfWeek, mealType: MealType, recipe: Recipe) => void;
@@ -22,6 +21,7 @@ interface MealPlannerTabProps {
   onClearWeek: () => void;
   onAddAllIngredients: (recipes: Recipe[]) => void;
 }
+
 const days: { key: DayOfWeek; label: string; short: string }[] = [
   { key: 'monday', label: 'Monday', short: 'Mon' },
   { key: 'tuesday', label: 'Tuesday', short: 'Tue' },
@@ -31,11 +31,13 @@ const days: { key: DayOfWeek; label: string; short: string }[] = [
   { key: 'saturday', label: 'Saturday', short: 'Sat' },
   { key: 'sunday', label: 'Sunday', short: 'Sun' },
 ];
+
 const mealTypes: { key: MealType; label: string; icon: string }[] = [
   { key: 'breakfast', label: 'Breakfast', icon: '🌅' },
   { key: 'lunch', label: 'Lunch', icon: '☀️' },
   { key: 'dinner', label: 'Dinner', icon: '🌙' },
 ];
+
 export function MealPlannerTab({
   mealPlan,
   onAddMeal,
@@ -44,52 +46,101 @@ export function MealPlannerTab({
   onAddAllIngredients,
 }: MealPlannerTabProps) {
   const [selectingSlot, setSelectingSlot] = useState<{ day: DayOfWeek; mealType: MealType } | null>(null);
+
   const getMeal = (day: DayOfWeek, mealType: MealType): Recipe | null => {
     return mealPlan[`${day}-${mealType}`] || null;
   };
+
   const plannedRecipes = Object.values(mealPlan).filter((r): r is Recipe => r !== null);
   const totalMeals = plannedRecipes.length;
+
   const handleSelectRecipe = (recipe: Recipe) => {
     if (selectingSlot) {
       onAddMeal(selectingSlot.day, selectingSlot.mealType, recipe);
       setSelectingSlot(null);
     }
   };
+
   const handleAddAllToList = () => {
     if (plannedRecipes.length > 0) {
       onAddAllIngredients(plannedRecipes);
     }
   };
 
-  
-  //Download meal plan 
-    const handleDownload = () => {
+  const handleDownload = () => {
     if (totalMeals === 0) {
       toast.error("Add some meals to your plan first");
       return;
     }
-    // Generate text content for the meal plan
-    let content = "🍽️ WEEKLY MEAL PLAN\n";
-    content += "═".repeat(50) + "\n\n";
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    // Title
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Weekly Meal Plan', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Date
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(128, 128, 128);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos, { align: 'center' });
+    doc.setTextColor(0, 0, 0);
+    yPos += 15;
+
+    // Days and meals
     days.forEach(day => {
-      content += `📅 ${day.label.toUpperCase()}\n`;
-      content += "─".repeat(30) + "\n";
+      // Check if we need a new page
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Day header
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setFillColor(245, 245, 245);
+      doc.rect(15, yPos - 5, pageWidth - 30, 10, 'F');
+      doc.text(day.label, 20, yPos + 2);
+      yPos += 12;
+
+      // Meals
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
       
       mealTypes.forEach(meal => {
         const recipe = getMeal(day.key, meal.key);
-        content += `  ${meal.icon} ${meal.label}: `;
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${meal.label}:`, 25, yPos);
+        doc.setFont('helvetica', 'normal');
+        
         if (recipe) {
-          content += `${recipe.title} (${recipe.prepTime + recipe.cookTime} min)\n`;
+          doc.text(`${recipe.title} (${recipe.prepTime + recipe.cookTime} min)`, 60, yPos);
         } else {
-          content += "—\n";
+          doc.setTextColor(160, 160, 160);
+          doc.text('No meal planned', 60, yPos);
+          doc.setTextColor(0, 0, 0);
         }
+        yPos += 7;
       });
-      content += "\n";
+      yPos += 5;
     });
-    // Add shopping list section
-    content += "═".repeat(50) + "\n";
-    content += "🛒 INGREDIENTS NEEDED\n";
-    content += "─".repeat(30) + "\n";
+
+    // Ingredients section
+    if (yPos > 200) {
+      doc.addPage();
+      yPos = 20;
+    }
+
+    yPos += 10;
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Shopping List', 20, yPos);
+    yPos += 10;
+
     const allIngredients = new Map<string, { amount: number; unit: string }>();
     plannedRecipes.forEach(recipe => {
       recipe.ingredients.forEach(ing => {
@@ -102,26 +153,30 @@ export function MealPlannerTab({
         }
       });
     });
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
     allIngredients.forEach((value, name) => {
-      content += `  • ${value.amount} ${value.unit} ${name}\n`;
+      if (yPos > 280) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`• ${value.amount} ${value.unit} ${name}`, 25, yPos);
+      yPos += 6;
     });
-    content += "\n─".repeat(30) + "\n";
-    content += "Generated by PantryPal\n";
-    // Create and download the file
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `meal-plan-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast.success("Meal plan downloaded!");
+
+    // Footer
+    doc.setFontSize(9);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Generated by PantryPal', pageWidth / 2, 290, { align: 'center' });
+
+    // Save the PDF
+    doc.save(`meal-plan-${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success("Meal plan downloaded as PDF!");
   };
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-6xl mx-auto px-4 pb-10 flex flex-col">
+    <div className="space-y-6 animate-fade-in  px-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-semibold text-foreground mb-2 flex items-center gap-3">
@@ -132,10 +187,18 @@ export function MealPlannerTab({
             Plan your meals for the week ahead
           </p>
         </div>
-        
         <div className="flex flex-wrap gap-2">
           {totalMeals > 0 && (
             <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownload}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -152,22 +215,14 @@ export function MealPlannerTab({
                 <ShoppingCart className="h-4 w-4" />
                 Add All to List
               </Button>
-                            <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownload}
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download
-              </Button>
             </>
           )}
         </div>
       </div>
+
       {/* Desktop Grid View */}
       <div className="hidden md:block overflow-x-auto">
-        <div className="min-w-200">
+        <div className="min-w-[800px]">
           {/* Header Row */}
           <div className="grid grid-cols-8 gap-2 mb-2">
             <div className="p-3" />
@@ -180,6 +235,7 @@ export function MealPlannerTab({
               </div>
             ))}
           </div>
+
           {/* Meal Rows */}
           {mealTypes.map(meal => (
             <div key={meal.key} className="grid grid-cols-8 gap-2 mb-2">
@@ -202,6 +258,7 @@ export function MealPlannerTab({
           ))}
         </div>
       </div>
+
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {days.map(day => (
@@ -236,6 +293,7 @@ export function MealPlannerTab({
           </div>
         ))}
       </div>
+
       {/* Recipe Selection Dialog */}
       <Dialog open={!!selectingSlot} onOpenChange={() => setSelectingSlot(null)}>
         <DialogContent className="max-w-md">
@@ -245,7 +303,7 @@ export function MealPlannerTab({
               Select a Recipe
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-100">
+          <ScrollArea className="max-h-[400px]">
             <div className="space-y-2 pr-4">
               {sampleRecipes.map(recipe => (
                 <button
@@ -269,12 +327,14 @@ export function MealPlannerTab({
     </div>
   );
 }
+
 interface MealSlotCardProps {
   recipe: Recipe | null;
   onAdd: () => void;
   onRemove: () => void;
   compact?: boolean;
 }
+
 function MealSlotCard({ recipe, onAdd, onRemove, compact = false }: MealSlotCardProps) {
   if (!recipe) {
     return (
@@ -289,6 +349,7 @@ function MealSlotCard({ recipe, onAdd, onRemove, compact = false }: MealSlotCard
       </button>
     );
   }
+
   return (
     <div
       className={cn(

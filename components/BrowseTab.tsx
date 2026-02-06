@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { FoodItemCard } from "./cards/FoodItemCard";
 import { CategoryCard } from "./cards/CategoryCard";
+import { FoodItemCard } from "./cards/FoodItemCard";
 import { foodItems, categoryInfo } from "@/data/food-data";
 import { FoodCategory, FoodItem } from "@/data/food-types";
 import {
@@ -29,91 +29,81 @@ interface BrowseTabProps {
 }
 
 export function BrowseTab({ onAddItem }: BrowseTabProps) {
-  const [selectedCategory, setSelectedCategory] = useState<FoodCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<FoodCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dialogSearch, setDialogSearch] = useState(""); // search inside dialog
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogSearch, setDialogSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
-  // Filtered items based on main search/category
   const filteredItems = useMemo(() => {
     let items = foodItems;
 
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       items = items.filter(
-        (item) =>
-          item.name.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query)
+        (i) =>
+          i.name.toLowerCase().includes(q) ||
+          i.category.toLowerCase().includes(q)
       );
     }
 
     if (selectedCategory) {
-      items = items.filter((item) => item.category === selectedCategory);
+      items = items.filter((i) => i.category === selectedCategory);
     }
 
     return items;
   }, [searchQuery, selectedCategory]);
 
-  // Filtered items inside dialog (with internal search)
   const dialogItems = useMemo(() => {
     if (!dialogSearch.trim()) return filteredItems;
-
-    const query = dialogSearch.toLowerCase();
-    return filteredItems.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query)
+    const q = dialogSearch.toLowerCase();
+    return filteredItems.filter((i) =>
+      i.name.toLowerCase().includes(q)
     );
   }, [dialogSearch, filteredItems]);
 
-  // Automatically open dialog on search or category select
   useEffect(() => {
-    if ((searchQuery.trim() || selectedCategory) && filteredItems.length > 0) {
-      setIsDialogOpen(true);
+    if ((searchQuery || selectedCategory) && filteredItems.length > 0) {
+      setOpen(true);
     }
   }, [searchQuery, selectedCategory, filteredItems.length]);
 
-  // Handle closing dialog: clear search, dialog search, and selected category
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
+  const closeDialog = () => {
+    setOpen(false);
     setSearchQuery("");
     setDialogSearch("");
     setSelectedCategory(null);
   };
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto px-4 pb-10 flex flex-col">
-      {/* Search Section */}
-      <section>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search for ingredients..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 h-12 text-base bg-card border-border"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
-            >
-              <X className="h-4 w-4 text-muted-foreground" />
-            </button>
-          )}
-        </div>
-      </section>
+    <div className=" overflow-x-hidden px-3 pb-6 space-y-6">
+      {/* Search */}
+      <div className="relative max-w-full">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search for ingredients..."
+          className="pl-9 pr-9 h-10 text-sm w-full"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
 
       {/* Categories */}
-      <section>
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
-          Food Categories
-        </h2>
-        <p className="text-muted-foreground mb-6">
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold">Food Categories</h2>
+        <p className="text-xs text-muted-foreground">
           Select a category to browse ingredients
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3  gap-4">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {categories.map((category) => (
             <CategoryCard
               key={category}
@@ -129,60 +119,49 @@ export function BrowseTab({ onAddItem }: BrowseTabProps) {
         </div>
       </section>
 
-      {/* Dialog Modal */}
-      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] p-0 overflow-hidden">
-          <DialogHeader className="p-4 border-b border-border">
-            <DialogTitle className="font-display text-xl flex items-center gap-2">
+      {/* Dialog */}
+      <Dialog open={open} onOpenChange={closeDialog}>
+        <DialogContent className="w-screen max-w-[100vw] max-h-[100dvh] overflow-x-hidden p-0">
+          <DialogHeader className="p-3 border-b">
+            <DialogTitle className="text-sm truncate">
               {selectedCategory
                 ? categoryInfo[selectedCategory].label
-                : "Search Results"}
-              {dialogItems.length > 0 && (
-                <span className="text-sm text-muted-foreground">
-                  ({dialogItems.length})
-                </span>
-              )}
+                : "Results"}{" "}
+              ({dialogItems.length})
             </DialogTitle>
           </DialogHeader>
 
-          {/* Search inside dialog */}
-          <div className="p-4 border-b border-border">
+          {/* Dialog search */}
+          <div className="p-3 border-b">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                type="text"
-                placeholder="Search within results..."
                 value={dialogSearch}
                 onChange={(e) => setDialogSearch(e.target.value)}
-                className="pl-10 pr-10 h-10 text-base bg-card border-border"
+                placeholder="Search results..."
+                className="pl-9 pr-9 h-9 text-sm"
               />
               {dialogSearch && (
                 <button
                   onClick={() => setDialogSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  <X className="h-4 w-4 text-muted-foreground" />
+                  <X className="h-4 w-4" />
                 </button>
               )}
             </div>
           </div>
 
-          <ScrollArea className="max-h-[60vh] p-4">
-            {dialogItems.length > 0 ? (
-              <div className="grid gap-3">
-                {dialogItems.map((item) => (
-                  <FoodItemCard
-                    key={item.id}
-                    item={item}
-                    onAdd={() => onAddItem(item)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No ingredients found.
-              </div>
-            )}
+          <ScrollArea className="h-[calc(100dvh-120px)] p-3">
+            <div className="flex flex-col gap-2 min-w-0">
+              {dialogItems.map((item) => (
+                <FoodItemCard
+                  key={item.id}
+                  item={item}
+                  onAdd={() => onAddItem(item)}
+                />
+              ))}
+            </div>
           </ScrollArea>
         </DialogContent>
       </Dialog>

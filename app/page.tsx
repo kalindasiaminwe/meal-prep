@@ -49,7 +49,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background min-w-7xl mx-auto">
+    <div className="min-h-screen bg-background max-w-7xl mx-auto overflow-x-hidden">
       <Header
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -62,7 +62,7 @@ const Index = () => {
         )}
 
         {activeTab === 'recipes' && (
-          <RecipesTab onAddItem={handleAddItem} />
+          <RecipesTab onAddItem={handleAddItem} shoppingListItems={items} />
         )}
 
         {activeTab === 'planner' && (

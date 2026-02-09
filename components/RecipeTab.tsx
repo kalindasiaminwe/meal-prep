@@ -74,6 +74,7 @@ export function RecipesTab({ onAddItem, shoppingListItems = [] }: RecipesTabProp
 
       setGeneratedRecipe(data.recipe);
       setShowGenerated(true);
+      
       toast.success("Recipe generated!", {
         description: data.recipe.title
       });

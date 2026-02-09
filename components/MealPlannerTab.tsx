@@ -222,7 +222,7 @@ export function MealPlannerTab({
 
       {/* Desktop Grid View */}
       <div className="hidden md:block overflow-x-auto">
-        <div className="min-w-[800px]">
+        <div className="min-w-200">
           {/* Header Row */}
           <div className="grid grid-cols-8 gap-2 mb-2">
             <div className="p-3" />
@@ -303,7 +303,7 @@ export function MealPlannerTab({
               Select a Recipe
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[400px]">
+          <ScrollArea className="max-h-100">
             <div className="space-y-2 pr-4">
               {sampleRecipes.map(recipe => (
                 <button

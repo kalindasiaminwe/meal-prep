@@ -46,14 +46,6 @@ export function RecipeModal({
               </span>
             </div>
           )}
-          {/* <Button
-            size="icon"
-            variant="secondary"
-            onClick={onClose}
-            className="absolute top-4 right-4 rounded-full"
-          >
-            <X className="h-4 w-4" />
-          </Button> */}
         </div>
 
         <ScrollArea className="max-h-[50vh]">

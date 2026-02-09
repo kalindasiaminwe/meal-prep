@@ -22,7 +22,7 @@ export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
 
             <div className="min-w-0">
               <h1 className="font-display font-bold text-sm sm:text-xl truncate">
-                PantryPal
+                ME.ALs
               </h1>
               <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                 Your kitchen companion
@@ -46,10 +46,10 @@ export function Header({ activeTab, onTabChange, cartCount }: HeaderProps) {
         {/* Tabs */}
         <nav className="grid grid-cols-1 md:grid-cols-4 gap-1 bg-muted p-1 rounded-lg max-w-full">
           {[
-            { key: "browse", label: "Browse" },
-            { key: "list", label: "List" },
+            { key: "browse", label: "Browse Ingredients" },
+            { key: "list", label: "Shopping List" },
             { key: "recipes", label: "Recipes" },
-            { key: "planner", label: "Planner" },
+            { key: "planner", label: "Meal Planner" },
           ].map((tab) => (
             <button
               key={tab.key}

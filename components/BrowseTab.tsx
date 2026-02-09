@@ -121,7 +121,7 @@ export function BrowseTab({ onAddItem }: BrowseTabProps) {
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={closeDialog}>
-        <DialogContent className="w-screen max-w-[100vw] max-h-dvh overflow-x-hidden p-0">
+        <DialogContent className="w-screen max-w-[80vw] max-h-[80vh] overflow-x-hidden ">
           <DialogHeader className="p-3 border-b">
             <DialogTitle className="text-sm truncate">
               {selectedCategory

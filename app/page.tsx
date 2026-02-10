@@ -10,6 +10,7 @@ import { useMealPlanner } from '@/hooks/useMealPlanner';
 import { RecipesTab } from '@/components/RecipeTab';
 import { FoodItem, Recipe } from '@/data/food-types';
 import { MealPlannerTab } from '@/components/MealPlannerTab';
+import { RecipeList } from '@/components/RecipeList';
 
 type Tab = 'browse' | 'recipes' | 'planner' | 'list';
 
@@ -63,6 +64,7 @@ const Index = () => {
 
         {activeTab === 'recipes' && (
           <RecipesTab onAddItem={handleAddItem} shoppingListItems={items} />
+          // <RecipeList />
         )}
 
         {activeTab === 'planner' && (

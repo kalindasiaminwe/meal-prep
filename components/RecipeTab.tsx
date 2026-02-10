@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sparkles, Loader2, ChefHat, ShoppingCart, AlertCircle } from 'lucide-react';
 import { RecipeModal } from './RecipeModal';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,14 @@ export function RecipesTab({ onAddItem, shoppingListItems = [] }: RecipesTabProp
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<GeneratedRecipe | null>(null);
   const [showGenerated, setShowGenerated] = useState(false);
+
+   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  
+    useEffect(() => {
+      fetch('/api/recipes')
+        .then(res => res.json())
+        .then(data => setRecipes(data));
+    }, []);
 
   const handleAddAllIngredients = () => {
     if (!selectedRecipe) return;
@@ -228,7 +236,7 @@ export function RecipesTab({ onAddItem, shoppingListItems = [] }: RecipesTabProp
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {sampleRecipes.map(recipe => (
+        {recipes.map(recipe => (
           <RecipeCard
             key={recipe.id}
             recipe={recipe}

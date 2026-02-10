@@ -1,10 +1,9 @@
-// app/api/test-db/route.ts
+import { connectDB } from '@/lib/dbConnect';
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
 
 export async function GET() {
   try {
-    await dbConnect();
+    await connectDB();
     return NextResponse.json({ message: 'MongoDB connected successfully!' });
   } catch (err) {
     return NextResponse.json({ message: 'Error connecting to MongoDB', error: err }, { status: 500 });

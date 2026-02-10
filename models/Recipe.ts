@@ -1,36 +1,30 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { FoodCategory, FoodItem } from '@/data/food-types';
+import mongoose, { Schema, models } from "mongoose";
 
-export interface RecipeDocument extends Document {
-  title: string;
-  description: string;
-  image?: string;
-  prepTime: number;
-  cookTime: number;
-  servings: number;
-  ingredients: {
-    itemId: string; 
-    amount: number;
-  }[];
-  instructions: string[];
-  categories: FoodCategory[];
-}
+const IngredientSchema = new Schema({
+  item: {
+    id: String,
+    name: String,
+    category: String,
+    unit: String,
+    image: String,
+  },
+  amount: Number,
+});
 
-const RecipeSchema = new Schema<RecipeDocument>({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  image: { type: String, default: '' },
-  prepTime: { type: Number, required: true },
-  cookTime: { type: Number, required: true },
-  servings: { type: Number, required: true },
-  ingredients: [
-    {
-      itemId: { type: String, required: true },
-      amount: { type: Number, required: true },
-    },
-  ],
-  instructions: [{ type: String, required: true }],
-  categories: [{ type: String, enum: ['protein','carbs','vegetables','dairy','fruits','fats'] }],
-}, { timestamps: true });
+const RecipeSchema = new Schema(
+  {
+    title: String,
+    description: String,
+    image: String,
+    prepTime: Number,
+    cookTime: Number,
+    servings: Number,
+    ingredients: [IngredientSchema],
+    instructions: [String],
+    categories: [String],
+  },
+  { timestamps: true }
+);
 
-export default mongoose.models.Recipe || mongoose.model<RecipeDocument>('Recipe', RecipeSchema);
+export const Recipe =
+  models.Recipe || mongoose.model("Recipe", RecipeSchema);

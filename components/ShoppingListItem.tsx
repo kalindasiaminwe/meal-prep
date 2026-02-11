@@ -44,7 +44,7 @@ export function ShoppingListItem({
         <p className="text-sm text-muted-foreground">{item.unit}</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <Button
           size="icon"
           variant="outline"
@@ -66,7 +66,7 @@ export function ShoppingListItem({
         >
           <Plus className="h-4 w-4" />
         </Button>
-      </div>
+      </div> */}
 
       <Button
         size="icon"

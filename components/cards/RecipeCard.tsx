@@ -15,7 +15,7 @@ export function RecipeCard({ recipe, onClick }: RecipeCardProps) {
   return (
     <button
       onClick={onClick}
-      className="group text-left w-full bg-card rounded-xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1"
+      className="group text-left w-full bg-card rounded-xl overflow-hidden shadow-lg hover:shadow-hover transition-all duration-300 hover:-translate-y-1"
     >
       <div className="aspect-4/3 bg-muted relative overflow-hidden">
         {recipe.image ? (
@@ -49,7 +49,7 @@ export function RecipeCard({ recipe, onClick }: RecipeCardProps) {
           {recipe.title}
         </h3>
         
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+       <p className="text-sm leading-5 h-10 text-muted-foreground line-clamp-2 overflow-hidden">
           {recipe.description}
         </p>
         

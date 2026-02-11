@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, Plus, X, ChefHat, ShoppingCart, Download } from 'lucide-react';
 import { DayOfWeek, MealType } from '@/hooks/useMealPlanner';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { jsPDF } from 'jspdf';
 import { Recipe } from '@/data/food-types';
-import { sampleRecipes } from '@/data/recipes';
+
 interface MealPlannerTabProps {
   mealPlan: Record<string, Recipe | null>;
   onAddMeal: (day: DayOfWeek, mealType: MealType, recipe: Recipe) => void;
@@ -53,6 +53,14 @@ export function MealPlannerTab({
 
   const plannedRecipes = Object.values(mealPlan).filter((r): r is Recipe => r !== null);
   const totalMeals = plannedRecipes.length;
+
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+    
+      useEffect(() => {
+        fetch('/api/recipes')
+          .then(res => res.json())
+          .then(data => setRecipes(data));
+      }, []);
 
   const handleSelectRecipe = (recipe: Recipe) => {
     if (selectingSlot) {
@@ -305,9 +313,9 @@ export function MealPlannerTab({
           </DialogHeader>
           <ScrollArea className="max-h-100">
             <div className="space-y-2 pr-4">
-              {sampleRecipes.map(recipe => (
+              {recipes.map(recipe => (
                 <button
-                  key={recipe.id}
+                  key={recipe._id}
                   onClick={() => handleSelectRecipe(recipe)}
                   className="w-full p-3 text-left rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors"
                 >

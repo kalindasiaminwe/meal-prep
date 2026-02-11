@@ -4,7 +4,6 @@ import { RecipeModal } from './RecipeModal';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { FoodItem, ShoppingItem, Recipe } from '@/data/food-types';
-import { sampleRecipes } from '@/data/recipes';
 import { RecipeCard } from './cards/RecipeCard';
 
 interface RecipesTabProps {
@@ -238,7 +237,7 @@ export function RecipesTab({ onAddItem, shoppingListItems = [] }: RecipesTabProp
       <div className="grid md:grid-cols-3 gap-6">
         {recipes.map(recipe => (
           <RecipeCard
-            key={recipe.id}
+            key={recipe._id}
             recipe={recipe}
             onClick={() => setSelectedRecipe(recipe)}
           />
